@@ -1,0 +1,3 @@
+print , get, if, else, while, hello, 31415
+
+: ; , . / \ + - and * {:;,./\+-**}
