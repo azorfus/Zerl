@@ -23,6 +23,9 @@ namespace lexer
         TOK_AND, TOK_OR,
         TOK_PRINT, TOK_GETS, 
         TOK_BACKSL, TOK_COMMENT,
+
+        TOK_NEWLINE, TOK_FALSE_QUOTE,
+        TOK_FALSE_DQUOTES,
         
         TOK_ADD, TOK_SUB,
         TOK_MUL, TOK_DIV,

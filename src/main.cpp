@@ -3,7 +3,6 @@
 #include <fstream>
 #include <sstream>
 #include "lexer/lexer.h"
-#include "parser/parser.h"
 
 using namespace std;
 
@@ -27,6 +26,7 @@ int main(int argc, char* argv[])
         cout << '(' << lexer.tokens[i].value << " : " << lexer.tokens[i].type << ", " << lexer.tokens[i].line_number << ") ";
         if(i%5==0 && i!=0) cout << endl;
     };
+    cout << endl;
 
     // feed tokens to parser ...
     return 0;

@@ -14,6 +14,7 @@ namespace lexer
         CONSTSRUCTOR,
         ARITHMETIC_OP,
         RELATIONAL_OP,
+        SPECIAL,
         KEYWORD,
         WHITESPACE
     };

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "../lexer/lexer.h"
+#include "ast.h"
 
 namespace parser
 {
@@ -18,7 +19,18 @@ namespace parser
             std::vector <union ASTNode> ast_nodes;
 
         private:
-            int current = 0;
+            int current_token = 0;
+            void consume();
+            void parse_expr(int, int);
+            void parse_statement(int, int);
+            void parse_if(int, int);
+            void parse_else(int, int);
+            void parse_while(int, int);
+            void parse_for(int, int);
+
+            bool fake_quote = false;
+            bool is_string = false;
+
     };
 };
 

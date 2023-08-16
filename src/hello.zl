@@ -5,6 +5,11 @@ print , get, if, else, while, hello, 31415
 # This is a single line comment.
 # This is another comment
 
+"\'" "\""
+
+"this is a string\n"
+"this is a \'string\' and another \"string\""
+
 func hi(int args)
 {
     print("hello world!");

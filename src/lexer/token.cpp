@@ -37,6 +37,10 @@ TOKEN Token::find_token_type(int state, std::string &value)
             else if(value == ">") return TOK_GREATER;
             else if(value == "<") return TOK_LESSER;
         case 5:
+            if(value == "\\n") return TOK_NEWLINE;
+            else if(value == "\\\'") return TOK_FALSE_QUOTE;
+            else if(value == "\\\"") return TOK_FALSE_DQUOTES;
+        case 6:
             if(value == "if") return TOK_IF;
             else if(value == "int") return TOK_INT;
             else if(value == "string") return TOK_STRING;
@@ -51,7 +55,7 @@ TOKEN Token::find_token_type(int state, std::string &value)
             else if(value == "func") return TOK_FUNC;
             else if(value == "return") return TOK_RETURN;
             else return TOK_NONE;
-        case 6: return TOK_WHSP;
+        case 7: return TOK_WHSP;
     };
     return TOK_NONE;
 };
