@@ -4,7 +4,7 @@ using namespace lexer;
 
 Token::Token() = default;
 
-Token::Token(int state, std::string val) : type(find_token_type(state, val)), value(val)
+Token::Token(int state, std::string val, unsigned int current_line) : type(find_token_type(state, val)), value(val), line_number(current_line)
 {
 };
 
@@ -26,6 +26,7 @@ TOKEN Token::find_token_type(int state, std::string &value)
             else if(value == "\'") return TOK_QUOTES;
             else if(value == "\\") return TOK_BACKSL;
             else if(value == ".") return TOK_DOT;
+            else if(value == "#") return TOK_COMMENT;
         case 3:
             if(value == "+") return TOK_ADD;
             else if(value == "-") return TOK_SUB;
@@ -47,6 +48,8 @@ TOKEN Token::find_token_type(int state, std::string &value)
             else if(value == "or") return TOK_OR;
             else if(value == "print") return TOK_PRINT;
             else if(value == "gets") return TOK_GETS;
+            else if(value == "func") return TOK_FUNC;
+            else if(value == "return") return TOK_RETURN;
             else return TOK_NONE;
         case 6: return TOK_WHSP;
     };

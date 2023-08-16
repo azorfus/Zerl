@@ -1,3 +1,14 @@
 print , get, if, else, while, hello, 31415
 
 : ; , . / \ + - and * {:;,./\+-**}
+
+# This is a single line comment.
+# This is another comment
+
+func hi(int args)
+{
+    print("hello world!");
+    return 0;
+}
+
+hi(34);

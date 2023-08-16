@@ -32,6 +32,7 @@ namespace lexer
             bool is_string = false;
             bool is_digits = false;
             bool is_float = false;
+            unsigned int current_line = 1;
 
             char current_token = 0;
             unsigned int current_index = 0;

@@ -18,8 +18,8 @@ Lexer::Lexer(std::string &buffer)
             {
                 if(tok.type != TOK_STRING_VAL)
                 {
-                    if(Token(KEYWORD, temp).type == 0) tokens.push_back(Token(STRING, temp));
-                    else tokens.push_back(Token(KEYWORD, temp));
+                    if(Token(KEYWORD, temp, current_line).type == 1) tokens.push_back(Token(STRING, temp, current_line));
+                    else tokens.push_back(Token(KEYWORD, temp, current_line));
                     is_string = false;
                 }
                 else
@@ -38,7 +38,7 @@ Lexer::Lexer(std::string &buffer)
             {
                 if(tok.type != TOK_INT_VAL)
                 {
-                    tokens.push_back(Token(INTEGER, temp));
+                    tokens.push_back(Token(INTEGER, temp, current_line));
                     is_digits = false;
                 }
                 else
@@ -65,6 +65,10 @@ Token Lexer::next_token(std::string& buffer, int index)
         state = WHITESPACE;
         val = "";
     }
+    if(current_token == '\n')
+    {
+        current_line += 1;
+    }
     else if(current_token == ' ')
     {
         state = WHITESPACE;
@@ -72,12 +76,12 @@ Token Lexer::next_token(std::string& buffer, int index)
     }
     else if(current_token == ',' || current_token == ';' || current_token == ':' || current_token == '{' || 
             current_token == '}' || current_token == '(' || current_token == ')' || current_token == '\\' || 
-            current_token == '\'' || current_token == '\"' || current_token == '.')
+            current_token == '\'' || current_token == '\"' || current_token == '.' || current_token == '#')
     {
         state = CONSTSRUCTOR;
         val = current_token;
     }
-    else if(isalpha(current_token) || current_token == '!' || current_token == '@' || current_token == '#' || current_token == '$')
+    else if(isalpha(current_token) || current_token == '!' || current_token == '@' || current_token == '$')
     {
         state = STRING;
         val = current_token;
@@ -97,7 +101,7 @@ Token Lexer::next_token(std::string& buffer, int index)
         state = RELATIONAL_OP;
         val = current_token;
     }
-    return Token(state, val);
+    return Token(state, val, current_line);
 };
 
 Lexer::~Lexer() = default;

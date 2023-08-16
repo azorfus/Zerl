@@ -22,7 +22,7 @@ namespace lexer
         TOK_FOR, TOK_IN,
         TOK_AND, TOK_OR,
         TOK_PRINT, TOK_GETS, 
-        TOK_BACKSL,
+        TOK_BACKSL, TOK_COMMENT,
         
         TOK_ADD, TOK_SUB,
         TOK_MUL, TOK_DIV,
@@ -40,7 +40,7 @@ namespace lexer
     {
         public:
             Token();
-            Token(int, std::string);
+            Token(int, std::string, unsigned int);
             TOKEN type;
             std::string value;
             unsigned int line_number;
