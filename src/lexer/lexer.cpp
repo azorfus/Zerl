@@ -10,35 +10,6 @@ Lexer::Lexer(std::string &buffer)
     while(current_index <= buffer_length)
     {
         tok = next_token(buffer, current_index);
-        gotta_go_back:
-        if(tok.type == TOK_BACKSL)
-        {
-            std::string temp = "";
-            current_index++;
-            if(current_index <= buffer_length) tok = next_token(buffer, current_index);
-            if(tok.type == TOK_STRING_VAL && tok.value == "n") 
-            { 
-                temp.append("\\n"); 
-                tokens.push_back(Token(SPECIAL, temp, current_line)); 
-                current_index++;
-                if(current_index <= buffer_length) tok = next_token(buffer, current_index);
-            }
-            else if(tok.type == TOK_QUOTES && tok.value == "\'") 
-            { 
-                temp.append("\\\'"); 
-                tokens.push_back(Token(SPECIAL, temp, current_line));
-                current_index++;
-                if(current_index <= buffer_length) tok = next_token(buffer, current_index);
-            }
-            else if(tok.type == TOK_DQUOTES && tok.value == "\"") 
-            { 
-                temp.append("\\\""); 
-                tokens.push_back(Token(SPECIAL, temp, current_line));
-                current_index++;
-                if(current_index <= buffer_length) tok = next_token(buffer, current_index);
-            }
-            else { current_index--; tok = next_token(buffer, current_index); }
-        }
         if(tok.type == TOK_STRING_VAL)
         {
             std::string temp = "";
@@ -50,7 +21,6 @@ Lexer::Lexer(std::string &buffer)
                     if(Token(KEYWORD, temp, current_line).type == 1) tokens.push_back(Token(STRING, temp, current_line));
                     else tokens.push_back(Token(KEYWORD, temp, current_line));
                     is_string = false;
-                    if(tok.type == TOK_BACKSL) goto gotta_go_back;
                 }
                 else
                 {
@@ -78,6 +48,34 @@ Lexer::Lexer(std::string &buffer)
                     if(current_index <= buffer_length) tok = next_token(buffer, current_index);
                 }
             }
+        }
+        if(tok.type == TOK_BACKSL)
+        {
+            std::string temp = "";
+            current_index++;
+            if(current_index <= buffer_length) tok = next_token(buffer, current_index);
+            if(tok.type == TOK_STRING_VAL && tok.value == "n") 
+            { 
+                temp.append("\\n"); 
+                tokens.push_back(Token(SPECIAL, temp, current_line)); 
+                current_index++;
+                if(current_index <= buffer_length) tok = next_token(buffer, current_index);
+            }
+            else if(tok.type == TOK_QUOTES && tok.value == "\'") 
+            { 
+                temp.append("\\\'"); 
+                tokens.push_back(Token(SPECIAL, temp, current_line));
+                current_index++;
+                if(current_index <= buffer_length) tok = next_token(buffer, current_index);
+            }
+            else if(tok.type == TOK_DQUOTES && tok.value == "\"") 
+            { 
+                temp.append("\\\""); 
+                tokens.push_back(Token(SPECIAL, temp, current_line));
+                current_index++;
+                if(current_index <= buffer_length) tok = next_token(buffer, current_index);
+            }
+            else { current_index--; tok = next_token(buffer, current_index); }
         }
         if(tok.type != TOK_WHSP) tokens.push_back(tok);
         current_index += 1;
