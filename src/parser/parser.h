@@ -15,6 +15,7 @@ namespace parser
             Parser::~Parser();
             
             std::vector <lexer::Token> tokens;
+            std::vector <union ASTNode> ast_nodes;
 
         private:
             int current = 0;

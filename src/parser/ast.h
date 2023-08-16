@@ -53,7 +53,7 @@ namespace parser
         Statement_Gets
     };
 
-    typedef struct StatmentNode StatementNode;
+    typedef struct StatementNode StatementNode;
     struct StatementNode
     {
         StatementType type;
@@ -62,10 +62,23 @@ namespace parser
             ExprNode* expression;
             StatementNode* block;
 
-
+            struct { ExprNode* ret_value; } stm_return;
+            struct { ExprNode* condition; StatementNode* next; } stm_if;
+            struct { StatementNode* next; } stm_else;
+            struct { ExprNode* condition; StatementNode* next; } stm_while;
+            struct { lexer::TOKEN var_type; std::string name; ExprNode* value; } stm_vardecln;
+            struct { std::string name; std::vector <lexer::TOKEN> param_types; std::vector <std::string> param_names; StatementNode* block; } stm_func_decln;
+            struct { ExprNode* print_value; } stm_print;
+            struct { lexer::TOKEN get_type; } stm_gets;
 
         } statement;
     };
+
+    union 
+    {
+        ExprNode node;
+        StatementNode node;
+    } ASTNode;
 
 }
 
