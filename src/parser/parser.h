@@ -35,13 +35,12 @@ namespace parser
             void stack_consume();
             
             ExprNode token_node();
+            lexer::TOKEN tok_peek(int);
             
+            ExprNode* parse_primary();
+            ExprNode* parse_term();
             ExprNode* parse_expr();
-            void parse_statement();
-            void parse_if();
-            void parse_else();
-            void parse_while();
-            void parse_for();
+            StatementNode* parse_statement();
 
             bool fake_quote = false;
             bool is_string = false;
