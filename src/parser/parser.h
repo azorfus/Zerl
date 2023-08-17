@@ -16,17 +16,32 @@ namespace parser
             Parser::~Parser();
             
             std::vector <lexer::Token> tokens;
-            std::vector <union ASTNode> ast_nodes;
+            std::vector <StatementNode> statement_nodes;
+            std::vector <ExprNode> expr_nodes;
 
         private:
-            int current_token = 0;
+            int current_index = 0;
+            int pos = 0;
+
+            lexer::Token current_token;
+            lexer::Token prev_token;
+            
+            std::vector <lexer::Token> stack;
+            lexer::Token stack_tokenC;
+            lexer::Token stack_tokenP;
+            int stack_index = 0;
+
             void consume();
-            void parse_expr(int, int);
-            void parse_statement(int, int);
-            void parse_if(int, int);
-            void parse_else(int, int);
-            void parse_while(int, int);
-            void parse_for(int, int);
+            void stack_consume();
+            
+            ExprNode token_node();
+            
+            ExprNode* parse_expr();
+            void parse_statement();
+            void parse_if();
+            void parse_else();
+            void parse_while();
+            void parse_for();
 
             bool fake_quote = false;
             bool is_string = false;

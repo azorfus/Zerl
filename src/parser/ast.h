@@ -22,6 +22,7 @@ namespace parser
         Value_IntLit, Value_FloatLit, Value_BoolLit,
         Value_StringLit
     };
+    enum NodeType { Expr, Statement };
 
     typedef struct ExprNode ExprNode;
     struct ExprNode
@@ -73,12 +74,6 @@ namespace parser
 
         } statement;
     };
-
-    union 
-    {
-        ExprNode node;
-        StatementNode node;
-    } ASTNode;
 
 }
 

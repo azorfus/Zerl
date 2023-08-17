@@ -44,6 +44,8 @@ TOKEN Token::find_token_type(int state, std::string &value)
             if(value == "if") return TOK_IF;
             else if(value == "int") return TOK_INT;
             else if(value == "string") return TOK_STRING;
+            else if(value == "bool") return TOK_BOOL;
+            else if(value == "float") return TOK_FLOAT;
             else if(value == "else") return TOK_ELSE;
             else if(value == "while") return TOK_WHILE;
             else if(value == "for") return TOK_FOR;
