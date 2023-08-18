@@ -99,7 +99,6 @@ ExprNode* Parser::parse_term()
 
 ExprNode* Parser::parse_expr()
 {
-    // GPT code below (math expr parser), optimize and understand.
     ExprNode* leftist = parse_term();
     ExprNode* giveback;
     while(stack_tokenC.type == lexer::TOK_ADD || stack_tokenC.type == lexer::TOK_SUB)
