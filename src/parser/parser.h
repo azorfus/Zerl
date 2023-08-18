@@ -12,8 +12,8 @@ namespace parser
     {
         public:
 
-            Parser::Parser();
-            Parser::~Parser();
+            Parser(std::vector <lexer::Token>);
+            ~Parser();
             
             std::vector <lexer::Token> tokens;
             std::vector <StatementNode> statement_nodes;

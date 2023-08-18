@@ -2,7 +2,7 @@
 
 using namespace parser;
 
-Parser::Parser()
+Parser::Parser(std::vector <lexer::Token> inp) : tokens(inp)
 {
     while(current_index <= tokens.size())
     {
@@ -18,7 +18,7 @@ Parser::Parser()
 
 void Parser::consume()
 {
-    prev_token == current_token;
+    prev_token = current_token;
     current_index++;
     if(current_index <= tokens.size()) current_token = tokens[current_index];
 }
@@ -65,52 +65,50 @@ ExprNode Parser::token_node()
 
 ExprNode* Parser::parse_primary()
 {
-    ExprNode* giveback;
+    ExprNode giveback;
     if(stack_tokenC.type == lexer::TOK_INT_VAL)
     {
-        giveback->int_lit = std::stoi(stack_tokenC.value);
-        return giveback;
+        giveback.int_lit = std::stoi(stack_tokenC.value);
     }
     else if(stack_tokenC.type == lexer::TOK_LBRACKET)
     {
         giveback = parse_expr();
         stack_consume(); // consume '(' ?
-        return giveback;
     }
-
+    return &expr_nodes[expr_nodes.size()];
 }
 
 ExprNode* Parser::parse_term()
 {
     ExprNode* leftist = parse_primary();
     ExprNode* rightist;
-    ExprNode* giveback;
+    ExprNode giveback;
     while(stack_tokenC.type == lexer::TOK_MUL || stack_tokenC.type == lexer::TOK_DIV)
     {
-        giveback->binary.op = stack_tokenC.type;
+        giveback.binary.op = stack_tokenC.type;
         stack_consume();
         rightist = parse_primary();
-        giveback->binary.right = rightist;
-        giveback->binary.left = leftist;
+        giveback.binary.right = rightist;
+        giveback.binary.left = leftist;
     }
-    return giveback;
+    return &giveback;
 
 }
 
 ExprNode* Parser::parse_expr()
 {
     ExprNode* leftist = parse_term();
-    ExprNode* giveback;
+    ExprNode giveback;
     while(stack_tokenC.type == lexer::TOK_ADD || stack_tokenC.type == lexer::TOK_SUB)
     {
-        giveback->binary.op = stack_tokenC.type;
+        giveback.binary.op = stack_tokenC.type;
         consume();
         ExprNode* right = parse_term();
-        giveback->type = Expr_Binary;
-        giveback->binary.left = leftist;
-        giveback->binary.right = right;
+        giveback.type = Expr_Binary;
+        giveback.binary.left = leftist;
+        giveback.binary.right = right;
     }
-    return giveback;
+    return &giveback;
 }
 
 StatementNode* Parser::parse_statement()
@@ -124,8 +122,8 @@ StatementNode* Parser::parse_statement()
         {
             StatementNode vardecln;
             vardecln.type = Statement_VarDecln;
-            vardecln.statement.stm_vardecln.name = stack_tokenC.value;
-            vardecln.statement.stm_vardecln.value = parse_expr();
+            vardecln.stm_vardecln.name = stack_tokenC.value;
+            vardecln.stm_vardecln.value = parse_expr();
             statement_nodes.push_back(vardecln);
         }
         else { /* Raise error */ };
