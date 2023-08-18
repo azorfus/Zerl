@@ -65,11 +65,35 @@ ExprNode Parser::token_node()
 
 ExprNode* Parser::parse_primary()
 {
+    ExprNode* giveback;
+    if(stack_tokenC.type == lexer::TOK_INT_VAL)
+    {
+        giveback->int_lit = std::stoi(stack_tokenC.value);
+        return giveback;
+    }
+    else if(stack_tokenC.type == lexer::TOK_LBRACKET)
+    {
+        giveback = parse_expr();
+        stack_consume(); // consume '(' ?
+        return giveback;
+    }
 
 }
 
 ExprNode* Parser::parse_term()
 {
+    ExprNode* leftist = parse_primary();
+    ExprNode* rightist;
+    ExprNode* giveback;
+    while(stack_tokenC.type == lexer::TOK_MUL || stack_tokenC.type == lexer::TOK_DIV)
+    {
+        giveback->binary.op = stack_tokenC.type;
+        stack_consume();
+        rightist = parse_primary();
+        giveback->binary.right = rightist;
+        giveback->binary.left = leftist;
+    }
+    return giveback;
 
 }
 
