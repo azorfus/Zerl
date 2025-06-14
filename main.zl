@@ -1,0 +1,9 @@
+hi wow this is working or what
+
+fn main(){
+	out("What");
+}
+
+what = 3 + 3 + 4*(3 + 2);
+
+in(What);
