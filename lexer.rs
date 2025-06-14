@@ -5,7 +5,7 @@ pub enum TokenType {
     Opt, Cpt, Ocl, Ccl, Scln, Equ,
     Eqv, Gre, Les, Geq, Leq, Out,
     In, Loop, If, Elif, Else, Func,
-    Iden, Qt, And, Or, Let
+    Iden, Qt, And, Or, Let, NewLine, Com
 }
 
 #[derive(Debug)]
@@ -76,8 +76,25 @@ pub fn lex(file_buffer: &str, pos: &mut usize) -> Option<Token> {
             ')' => Some(Token { ttype: TokenType::Cpt, value: ")".to_string() }),
             '{' => Some(Token { ttype: TokenType::Ocl, value: "{".to_string() }),
             '}' => Some(Token { ttype: TokenType::Ccl, value: "}".to_string() }),
+            ',' => Some(Token { ttype: TokenType::Com, value: ",".to_string() }),
             ';' => Some(Token { ttype: TokenType::Scln, value: ";".to_string() }),
             '\"' => Some(Token { ttype: TokenType::Qt, value: "\"".to_string() }),
+
+            '\\' => {
+			    *pos += 1;
+			    match chars[*pos] {
+			        
+			        "\"" => {
+					        	*pos += 1;
+					       		Some(Token { ttype: TokenType::Iden, value: "\"".to_string() })
+					       	}
+
+			    	"n" => {
+					        	*pos += 1;
+					       		Some(Token { ttype: TokenType::NewLine, value: "\n".to_string() })
+					       }
+			    }
+			},
 
             '=' => {
 			    *pos += 1;

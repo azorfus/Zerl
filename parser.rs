@@ -1,9 +1,14 @@
 use crate::lexer::{Token, TokenType, lex};
 
+enum var_value {
+    Str(String),
+    Val(f64),
+}
+
 pub enum ASTNode {
 
     Number(f64),
-    
+
     StrLiteral(String),
 
     BinOpNode {
@@ -13,32 +18,52 @@ pub enum ASTNode {
     },
 
     VarDecNode {
-
+        name: String,
+        value: var_value,
     },
 
     AssignNode {
-
+        name: String,
+        value: var_value,
     },
 
     IfElseNode {
-
+        condition: Box<ASTNode>,
+        then_branch: Vec<ASTNode>,
+        elif_branch: Vec<(Box<ASTNode>, Vec<ASTNode>)>,
+        else_branch: Option<Vec<ASTNode>>,
     },
 
     LoopNode {
-
+        condition: Box<ASTNode>,
+        block: Vec<ASTNode>,
     },
+
+    FuncCall {
+        name: String,
+        arguments: Vec<ASTNode>,
+    },
+
+    FuncDef {
+        name: String,
+        arguments: Vec<ASTNode>,
+        block: Vec<ASTNode>,
+    },
+
 }
 
 pub struct parser {
     tokens: Vec<Token>,
-    pos: usize;
+    pos: usize,
 }
 
-impl Parser {
+impl parser {
 
     pub fn new(tokens: Vec<Token>) -> Self {
-        tokens,
-        pos: 0,
+        return Self {
+            tokens,
+            pos: 0,
+        };
     }
 
     fn consume(&self) {
@@ -53,7 +78,7 @@ impl Parser {
         }
     }
 
-    fn current(&self) -> Option<ASTNode> {
+    fn current(&self) -> Option<&Token> {
         return self.tokens.get(self.pos);
     }
 
@@ -87,7 +112,7 @@ impl Parser {
                 return Some(node);
             }
 
-            _ => return None;
+            _ => return None,
         }
     }
 
@@ -186,19 +211,19 @@ impl Parser {
 
     fn parse_statement(&mut self) -> Option<ASTNode> {
         match self.current()?.ttype {
-            TokenType::Let => self.parse_var_def();
-            TokenType::Func => self.parse_func_def();
-            TokenType::If => self.parse_ifelse();
-            TokenType::Loop => self.parse_loop();
+            TokenType::Let => self.parse_var_def(),
+            TokenType::Func => self.parse_func_def(),
+            TokenType::If => self.parse_ifelse(),
+            TokenType::Loop => self.parse_loop(),
 
             TokenType::Iden => {
                 let ident = self.current()?.value;
                 self.consume();
                 if self.current()?.ttype == TokenType::Opt {
-                    self.parse_func_call();
+                    return self.parse_func_call();
                 }
                 else if self.current()?.ttype == TokenType::Equ {
-                    self.parse_assign();
+                    return self.parse_assign();
                 }
                 else { 
                     println!("[!]Error parsing at Token: {}", self.pos);
@@ -206,17 +231,101 @@ impl Parser {
                 }
             }
 
-            _ => self.parse_expr();
+            _ => self.parse_expr(),
         }
+    }
+
+    fn parse_block(&mut self) -> Option<Vec<ASTNode>> {
+        self.consume(); // consume {
+        
+        let mut statements: Vec<ASTNode> = Vec::new();
+
+        while let Some(token) = self.current() {
+
+            if token.ttype == TokenType::Ccl {
+                break
+            }
+
+            if let Some(node) = self.parse_statement() {
+                statements.push(node);
+            } else {
+                return None;
+            }
+        } 
+
+        if self.current()?.ttype != TokenType::Ccl {
+            return None; // unterminated block
+        }
+
+        self.consume(); // Consume }
+
+        return Some(statements);
+    }
+
+    fn parse_string(&mut self) -> Option<ASTNode> {
+        self.consume(); // consume "
+        let mut literal: String = String::new();
+        while let Some(token) = self.current() {
+            if token.ttype == TokenType::Qt {
+                break;
+            }
+            literal.push_str(&token.value);
+            self.consume();
+        } 
+        
+        if self.current()?.ttype != TokenType::Qt {
+            return None; // unterminated string
+        }
+        
+        self.consume();
+        
+        return Some(ASTNode::StrLiteral(literal));
     }
 
     fn parse_var_def(&mut self) -> Option<ASTNode> {
         self.consume(); // consume the 'let'
+        let name = self.current()?;
+        self.consume();
+        self.consume(); // consume the '='
+        let value = self.current()?;
 
+        let mut node = ASTNode::VarDecNode {
+            name.var_value,
+            value.var_value,
+        };
     }
 
     fn parse_func_def(&mut self) -> Option<ASTNode> {
+        self.consume(); // consume the 'fn'
+        let name = self.current()?.value.clone();
+        self.consume();
 
+        self.consume(); // consume (
+        let arguments = self.parse_arguments();
+        
+        if self.current()?.ttype != TokenType::Cpt {
+            return None; // unterminated condition
+        }
+        
+        self.consume(); // consume )
+        if let Some(block) = self.parse_block() {      
+
+            let node = ASTNode::FuncDef {
+                name,
+                arguments,
+                block,
+            };
+
+            return Some(node);
+
+        }
+        else {
+            return None;
+        }
+    }
+
+    fn parse_arguments(&mut self) -> Opetion<ASTNode> {
+        
     }
 
     fn parse_func_call(&mut self) -> Option<ASTNode> {
