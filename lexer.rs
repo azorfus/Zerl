@@ -4,8 +4,8 @@ pub enum TokenType {
     Num, Add, Sub, Div, Mul, Dot,
     Opt, Cpt, Ocl, Ccl, Scln, Equ,
     Eqv, Gre, Les, Geq, Leq, Out,
-    In, Loop, If, Elif, Else, Fn,
-    Str, Qt,
+    In, Loop, If, Elif, Else, Func,
+    Iden, Qt, And, Or, Let
 }
 
 #[derive(Debug)]
@@ -56,8 +56,11 @@ pub fn lex(file_buffer: &str, pos: &mut usize) -> Option<Token> {
 			    "if" => TokenType::If,
 			    "elif" => TokenType::Elif,
 			    "else" => TokenType::Else,
-			    "fn" => TokenType::Fn,
-			    _ => TokenType::Str,
+			    "fn" => TokenType::Func,
+			    "and" => TokenType::And,
+			    "or" => TokenType::Or,
+			    "let" => TokenType::Let,
+			    _ => TokenType::Iden,
 			};
 
 			return Some(Token { ttype: token_type, value: val })
