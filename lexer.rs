@@ -1,8 +1,8 @@
 #[derive(Debug, PartialEq)]
 
 pub enum TokenType {
-    Num, Add, Sub, Div, Mul, Dot,
-    Opt, Cpt, Ocl, Ccl, Scln, Equ,
+    Num, Add, Sub, Div, Mul, Dot, True,
+    Opt, Cpt, Ocl, Ccl, Scln, Equ, False,
     Eqv, Gre, Les, Geq, Leq, Out,
     In, Loop, If, Elif, Else, Func,
     Iden, Qt, And, Or, Let, NewLine, Com
@@ -56,6 +56,8 @@ pub fn lex(file_buffer: &str, pos: &mut usize) -> Option<Token> {
 			    "if" => TokenType::If,
 			    "elif" => TokenType::Elif,
 			    "else" => TokenType::Else,
+			    "true" => TokenType::True,
+			    "false" => TokenType::False,
 			    "fn" => TokenType::Func,
 			    "and" => TokenType::And,
 			    "or" => TokenType::Or,

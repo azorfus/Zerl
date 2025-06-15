@@ -67,7 +67,7 @@ impl parser {
     }
 
     fn consume(&self) {
-        if self.pos + 1 <= self.tokens.len() {
+        if self.pos + 1 < self.tokens.len() {
             self.pos+=1;
         }
     }
@@ -264,7 +264,9 @@ impl parser {
 
     fn parse_string(&mut self) -> Option<ASTNode> {
         self.consume(); // consume "
+
         let mut literal: String = String::new();
+
         while let Some(token) = self.current() {
             if token.ttype == TokenType::Qt {
                 break;
@@ -295,12 +297,11 @@ impl parser {
         };
     }
 
-    fn parse_func_def(&mut self) -> Option<ASTNode> {
+    fn parse_func_def(&mut self) -> Option<ASTNode> {   
         self.consume(); // consume the 'fn'
         let name = self.current()?.value.clone();
         self.consume();
 
-        self.consume(); // consume (
         let arguments = self.parse_arguments();
         
         if self.current()?.ttype != TokenType::Cpt {
@@ -324,11 +325,47 @@ impl parser {
         }
     }
 
-    fn parse_arguments(&mut self) -> Opetion<ASTNode> {
+    fn parse_func_call(&mut self) -> Option<ASTNode> {
+        let name = self.current()?.value.clone();
+        self.consume();
+
+        let arguments = self.parse_args_call();
+        
+        if self.current()?.ttype != TokenType::Cpt {
+            return None; // unterminated condition
+        }
+        
+        self.consume(); // consume )
+
+        if self.current()?.ttype != TokenType::Scln {
+            return None; // unterminated condition
+        }
+
+        self.consume(); // consume ;
+
+        let node = ASTNode::FuncCall {
+            name,
+            arguments,
+        }
+
+        return Some(node);
         
     }
 
-    fn parse_func_call(&mut self) -> Option<ASTNode> {
+    fn parse_args_def(&mut self) -> Option<Vec<String>> {
+        self.consume(); // consume (
+
+        let mut arguments: Vec<String> = Vec::new();
+
+        while let Some(token) = self.current() {
+            arguments.push(token);
+
+            self.consume();
+            if()
+        } 
+    }
+
+    fn parse_args_call(&mut self) -> Option<Vec<ASTNode>> {
 
     }
 
