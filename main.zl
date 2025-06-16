@@ -1,9 +1,18 @@
-hi wow this is working or what
 
 fn main(){
-	out("What");
+	out("Hello World!");
+	out("Hello...\n");
 }
 
-what = 3 + 3 + 4*(3 + 2);
+main();
 
-in(What);
+loop (a < b) {
+	a = in("Enter A: ");
+	b = in("Enter B: ");
+
+	out(a + b);
+
+	if(a == b) {
+		break;
+	}
+}

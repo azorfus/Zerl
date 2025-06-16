@@ -50,7 +50,7 @@ fn main() -> std::io::Result<()> {
 
     return Ok(());
 }
-
+/*
 
 fn pretty_print(node: &parser::ASTNode, prefix: &str, is_last: bool) {
     let connector = if is_last { "└── " } else { "├── " };
@@ -70,3 +70,4 @@ fn pretty_print(node: &parser::ASTNode, prefix: &str, is_last: bool) {
         }
     }
 }
+*/

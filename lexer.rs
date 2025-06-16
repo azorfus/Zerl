@@ -3,9 +3,9 @@
 pub enum TokenType {
     Num, Add, Sub, Div, Mul, Dot, True,
     Opt, Cpt, Ocl, Ccl, Scln, Equ, False,
-    Eqv, Gre, Les, Geq, Leq, Out,
-    In, Loop, If, Elif, Else, Func,
-    Iden, Qt, And, Or, Let, NewLine, Com
+    Eqv, Gre, Les, Geq, Leq, Out, Break,
+    In, Loop, If, Elif, Else, Func, Slash,
+    Iden, Qt, And, Or, Let, NewLine, Com, Str
 }
 
 #[derive(Debug)]
@@ -22,6 +22,92 @@ pub fn lex(file_buffer: &str, pos: &mut usize) -> Option<Token> {
             *pos += 1;
             continue;
         }
+
+        // Match single-character tokens
+        let tok = match chars[*pos] {
+            '+' => Some(Token { ttype: TokenType::Add, value: "+".to_string() }),
+            '-' => Some(Token { ttype: TokenType::Sub, value: "-".to_string() }),
+            '*' => Some(Token { ttype: TokenType::Mul, value: "*".to_string() }),
+            '/' => Some(Token { ttype: TokenType::Div, value: "/".to_string() }),
+            '(' => Some(Token { ttype: TokenType::Opt, value: "(".to_string() }),
+            ')' => Some(Token { ttype: TokenType::Cpt, value: ")".to_string() }),
+            '{' => Some(Token { ttype: TokenType::Ocl, value: "{".to_string() }),
+            '}' => Some(Token { ttype: TokenType::Ccl, value: "}".to_string() }),
+            ',' => Some(Token { ttype: TokenType::Com, value: ",".to_string() }),
+            ';' => Some(Token { ttype: TokenType::Scln, value: ";".to_string() }),
+            
+            '\"' => {
+            			*pos += 1; // consume "
+            			let mut literal: String = String::new();
+            			while *pos < chars.len() && chars[*pos] != '\"'
+            			{
+				            if chars[*pos] == '\\' {
+							    *pos += 1;
+
+							    match chars[*pos] {
+							        
+							        '\"' => {
+									        	*pos += 1;
+									       		literal.push('\"');
+									       	}
+
+							    	'n' => 	{
+									        	*pos += 1;
+									       		literal.push('\n');
+									       	}
+
+							        '\\' =>  {
+							        			*pos += 1;
+									       		literal.push('\\');
+							       			}
+
+									 _  => 	{
+									 			return None;
+									 	   	}
+							    }
+							}
+							else {
+								literal.push(chars[*pos]);
+								*pos += 1;
+							}
+
+            			}
+            			*pos += 1; // consume "
+            			return Some(Token { ttype: TokenType::Str, value: literal })
+            		},
+
+            '=' => {
+			    *pos += 1;
+			    if chars[*pos] == '=' {
+			        *pos += 1;
+			        Some(Token { ttype: TokenType::Eqv, value: "==".to_string() })
+			    } else {
+			        Some(Token { ttype: TokenType::Equ, value: "=".to_string() })
+			    }
+			},
+
+			'<' => {
+			    *pos += 1;
+			    if chars[*pos] == '=' {
+			        *pos += 1;
+			        Some(Token { ttype: TokenType::Leq, value: "<=".to_string() })
+			    } else {
+			        Some(Token { ttype: TokenType::Les, value: "<".to_string() })
+			    }
+			},
+
+			'>' => {
+			    *pos += 1;
+			    if chars[*pos] == '=' {
+			        *pos += 1;
+			        Some(Token { ttype: TokenType::Geq, value: ">=".to_string() })
+			    } else {
+			        Some(Token { ttype: TokenType::Gre, value: ">".to_string() })
+			    }
+			},
+
+            _ => None,
+        };
 
         if chars[*pos].is_ascii_digit() {
             let mut val = String::new();
@@ -58,6 +144,7 @@ pub fn lex(file_buffer: &str, pos: &mut usize) -> Option<Token> {
 			    "else" => TokenType::Else,
 			    "true" => TokenType::True,
 			    "false" => TokenType::False,
+			    "break" => TokenType::Break,
 			    "fn" => TokenType::Func,
 			    "and" => TokenType::And,
 			    "or" => TokenType::Or,
@@ -67,69 +154,6 @@ pub fn lex(file_buffer: &str, pos: &mut usize) -> Option<Token> {
 
 			return Some(Token { ttype: token_type, value: val })
         }
-
-        // Match single-character tokens
-        let tok = match chars[*pos] {
-            '+' => Some(Token { ttype: TokenType::Add, value: "+".to_string() }),
-            '-' => Some(Token { ttype: TokenType::Sub, value: "-".to_string() }),
-            '*' => Some(Token { ttype: TokenType::Mul, value: "*".to_string() }),
-            '/' => Some(Token { ttype: TokenType::Div, value: "/".to_string() }),
-            '(' => Some(Token { ttype: TokenType::Opt, value: "(".to_string() }),
-            ')' => Some(Token { ttype: TokenType::Cpt, value: ")".to_string() }),
-            '{' => Some(Token { ttype: TokenType::Ocl, value: "{".to_string() }),
-            '}' => Some(Token { ttype: TokenType::Ccl, value: "}".to_string() }),
-            ',' => Some(Token { ttype: TokenType::Com, value: ",".to_string() }),
-            ';' => Some(Token { ttype: TokenType::Scln, value: ";".to_string() }),
-            '\"' => Some(Token { ttype: TokenType::Qt, value: "\"".to_string() }),
-
-            '\\' => {
-			    *pos += 1;
-			    match chars[*pos] {
-			        
-			        "\"" => {
-					        	*pos += 1;
-					       		Some(Token { ttype: TokenType::Iden, value: "\"".to_string() })
-					       	}
-
-			    	"n" => {
-					        	*pos += 1;
-					       		Some(Token { ttype: TokenType::NewLine, value: "\n".to_string() })
-					       }
-			    }
-			},
-
-            '=' => {
-			    *pos += 1;
-			    if chars[*pos] == '=' {
-			        *pos += 1;
-			        Some(Token { ttype: TokenType::Eqv, value: "==".to_string() })
-			    } else {
-			        Some(Token { ttype: TokenType::Equ, value: "=".to_string() })
-			    }
-			},
-
-			'<' => {
-			    *pos += 1;
-			    if chars[*pos] == '=' {
-			        *pos += 1;
-			        Some(Token { ttype: TokenType::Leq, value: "<=".to_string() })
-			    } else {
-			        Some(Token { ttype: TokenType::Les, value: "<".to_string() })
-			    }
-			},
-
-			'>' => {
-			    *pos += 1;
-			    if chars[*pos] == '=' {
-			        *pos += 1;
-			        Some(Token { ttype: TokenType::Geq, value: ">=".to_string() })
-			    } else {
-			        Some(Token { ttype: TokenType::Gre, value: ">".to_string() })
-			    }
-			},
-
-            _ => None,
-        };
 
         *pos += 1;
         return tok;

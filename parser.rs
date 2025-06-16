@@ -1,10 +1,5 @@
 use crate::lexer::{Token, TokenType, lex};
 
-enum var_value {
-    Str(String),
-    Val(f64),
-}
-
 pub enum ASTNode {
 
     Number(f64),
@@ -19,12 +14,12 @@ pub enum ASTNode {
 
     VarDecNode {
         name: String,
-        value: var_value,
+        value: Box<ASTNode>,
     },
 
     AssignNode {
         name: String,
-        value: var_value,
+        value: Box<ASTNode>,
     },
 
     IfElseNode {
@@ -46,7 +41,7 @@ pub enum ASTNode {
 
     FuncDef {
         name: String,
-        arguments: Vec<ASTNode>,
+        arguments: Vec<String>,
         block: Vec<ASTNode>,
     },
 
@@ -66,13 +61,13 @@ impl parser {
         };
     }
 
-    fn consume(&self) {
+    fn consume(&mut self) {
         if self.pos + 1 < self.tokens.len() {
             self.pos+=1;
         }
     }
 
-    fn puke(&self) {
+    fn puke(&mut self) {
         if self.pos - 1 >= 0 {
             self.pos-=1;
         }
@@ -217,7 +212,6 @@ impl parser {
             TokenType::Loop => self.parse_loop(),
 
             TokenType::Iden => {
-                let ident = self.current()?.value;
                 self.consume();
                 if self.current()?.ttype == TokenType::Opt {
                     return self.parse_func_call();
@@ -266,35 +260,29 @@ impl parser {
         self.consume(); // consume "
 
         let mut literal: String = String::new();
-
-        while let Some(token) = self.current() {
-            if token.ttype == TokenType::Qt {
-                break;
-            }
-            literal.push_str(&token.value);
-            self.consume();
-        } 
-        
-        if self.current()?.ttype != TokenType::Qt {
-            return None; // unterminated string
-        }
-        
-        self.consume();
         
         return Some(ASTNode::StrLiteral(literal));
     }
 
     fn parse_var_def(&mut self) -> Option<ASTNode> {
         self.consume(); // consume the 'let'
-        let name = self.current()?;
+        let name = self.current()?.value.clone();
         self.consume();
         self.consume(); // consume the '='
-        let value = self.current()?;
+        let value = self.parse_expr()?;
+
+        if self.current()?.ttype != TokenType::Scln {
+            return None;
+        }
+
+        self.consume(); // consume ;
 
         let mut node = ASTNode::VarDecNode {
-            name.var_value,
-            value.var_value,
+            name: name,
+            value: Box::new(value),
         };
+
+        return Some(node);
     }
 
     fn parse_func_def(&mut self) -> Option<ASTNode> {   
@@ -302,7 +290,7 @@ impl parser {
         let name = self.current()?.value.clone();
         self.consume();
 
-        let arguments = self.parse_arguments();
+        let arguments = self.parse_args_def()?;
         
         if self.current()?.ttype != TokenType::Cpt {
             return None; // unterminated condition
@@ -326,10 +314,11 @@ impl parser {
     }
 
     fn parse_func_call(&mut self) -> Option<ASTNode> {
+        self.puke();
         let name = self.current()?.value.clone();
         self.consume();
 
-        let arguments = self.parse_args_call();
+        let arguments = self.parse_args_call()?;
         
         if self.current()?.ttype != TokenType::Cpt {
             return None; // unterminated condition
@@ -346,39 +335,106 @@ impl parser {
         let node = ASTNode::FuncCall {
             name,
             arguments,
-        }
+        };
 
-        return Some(node);
-        
+        return Some(node); 
     }
 
     fn parse_args_def(&mut self) -> Option<Vec<String>> {
         self.consume(); // consume (
 
-        let mut arguments: Vec<String> = Vec::new();
+        let mut arguments = Vec::new();
 
         while let Some(token) = self.current() {
-            arguments.push(token);
 
-            self.consume();
-            if()
-        } 
+            if token.ttype == TokenType::Cpt {
+                self.consume(); // consume )
+                return Some(arguments);
+            }
+
+            arguments.push(token.value.clone());
+            self.consume(); // consume identifier
+
+            match self.current()?.ttype {
+
+                TokenType::Com => {
+                    self.consume(); // consume ,
+                }
+                TokenType::Cpt => {
+                    self.consume(); // consume )
+                    return Some(arguments);
+                }
+
+                _ => return None,
+
+            }
+        }
+
+        None
     }
 
     fn parse_args_call(&mut self) -> Option<Vec<ASTNode>> {
+        self.consume(); // consume (
 
+        let mut arguments = Vec::new();
+
+        loop {
+            if self.current()?.ttype == TokenType::Cpt {
+                self.consume(); // consume )
+                return Some(arguments);
+            }
+
+            let node = self.parse_expr()?; 
+            arguments.push(node);
+
+            match self.current()?.ttype {
+                TokenType::Com => {
+                    self.consume(); // consume ,
+                }
+                TokenType::Cpt => {
+                    self.consume(); // consume )
+                    return Some(arguments);
+                }
+                _ => return None,
+            }
+        }
+
+        None
     }
 
     fn parse_loop(&mut self) -> Option<ASTNode> {
+        let mut node = self.parse_comp_expr()?;
+        return Some(node);
 
     }
 
     fn parse_ifelse(&mut self) -> Option<ASTNode> {
+        let mut node = self.parse_comp_expr()?;
+        return Some(node);
 
     }
 
     fn parse_assign(&mut self) -> Option<ASTNode> {
+        self.puke();
+        let name = self.current()?.value.clone();
+        self.consume();
 
+        self.consume(); // consume =
+
+        let value = self.parse_expr()?;
+
+        let node = ASTNode::AssignNode {
+            name,
+            value: Box::new(value),
+        };
+
+        if self.current()?.ttype != TokenType::Scln {
+            return None; // unterminated condition
+        }
+
+        self.consume(); // consume ;
+
+        return Some(node);
     }
 
 }
