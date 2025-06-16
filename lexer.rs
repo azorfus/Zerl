@@ -3,9 +3,9 @@
 pub enum TokenType {
     Num, Add, Sub, Div, Mul, Dot, True,
     Opt, Cpt, Ocl, Ccl, Scln, Equ, False,
-    Eqv, Gre, Les, Geq, Leq, Out, Break,
-    In, Loop, If, Elif, Else, Func, Slash,
-    Iden, Qt, And, Or, Let, NewLine, Com, Str
+    Eqv, Gre, Les, Geq, Leq, Break, Str,
+    Loop, If, Elif, Else, Func, Slash, Return,
+    Iden, Qt, And, Or, Let, NewLine, Com
 }
 
 #[derive(Debug)]
@@ -18,6 +18,14 @@ pub fn lex(file_buffer: &str, pos: &mut usize) -> Option<Token> {
     let chars: Vec<char> = file_buffer.chars().collect();
 
     while *pos < chars.len() {
+
+    	if chars[*pos] == '#' {
+		    while *pos < chars.len() && chars[*pos] != '\n' {
+		        *pos += 1;
+		    }
+		    continue; 
+		}
+
         if chars[*pos].is_whitespace() {
             *pos += 1;
             continue;
@@ -126,34 +134,37 @@ pub fn lex(file_buffer: &str, pos: &mut usize) -> Option<Token> {
             }
             return Some(Token { ttype: TokenType::Num, value: val });
         } 
-        else if chars[*pos].is_ascii_alphabetic() {
-        	let mut val = String::new();
-            let mut float = false;
-            while *pos < chars.len() && chars[*pos].is_ascii_alphabetic() {
-                val.push(chars[*pos]);
-                *pos += 1;
-            }
+        else if chars[*pos].is_ascii_alphabetic() || chars[*pos] == '_' {
 
-            // Identifiers
-            let token_type = match val.as_str() {
-			    "out" => TokenType::Out,
-			    "in" => TokenType::In,
-			    "loop" => TokenType::Loop,
-			    "if" => TokenType::If,
-			    "elif" => TokenType::Elif,
-			    "else" => TokenType::Else,
-			    "true" => TokenType::True,
-			    "false" => TokenType::False,
-			    "break" => TokenType::Break,
-			    "fn" => TokenType::Func,
-			    "and" => TokenType::And,
-			    "or" => TokenType::Or,
-			    "let" => TokenType::Let,
-			    _ => TokenType::Iden,
-			};
+		    let mut val = String::new();
 
-			return Some(Token { ttype: token_type, value: val })
-        }
+		    val.push(chars[*pos]);
+		    *pos += 1;
+
+		    while *pos < chars.len() && (chars[*pos].is_ascii_alphanumeric() || chars[*pos] == '_') {
+		        val.push(chars[*pos]);
+		        *pos += 1;
+		    }
+
+		    let token_type = match val.as_str() {
+		        "loop" => TokenType::Loop,
+		        "if" => TokenType::If,
+		        "elif" => TokenType::Elif,
+		        "else" => TokenType::Else,
+		        "true" => TokenType::True,
+		        "false" => TokenType::False,
+		        "break" => TokenType::Break,
+		        "return" => TokenType::Return,
+		        "fn" => TokenType::Func,
+		        "and" => TokenType::And,
+		        "or" => TokenType::Or,
+		        "let" => TokenType::Let,
+		        _ => TokenType::Iden,
+		    };
+
+		    return Some(Token { ttype: token_type, value: val });
+		}
+
 
         *pos += 1;
         return tok;
