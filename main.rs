@@ -24,10 +24,14 @@ fn main() -> std::io::Result<()> {
 
     let mut pos = 0;
     let mut tokens = Vec::new();
-    while pos < file_buffer.len() {
+    loop {
         match lexer::lex(&file_buffer, &mut pos) {
             Some(tok) => {
-                // println!("{:?}", tok); // Optional: debug print
+                println!("{:?}", tok);
+                if tok.ttype == lexer::TokenType::Eof {
+                    tokens.push(tok);
+                    break;
+                }
                 tokens.push(tok);
             }
             None => {
@@ -64,6 +68,11 @@ fn pretty_print(node: &ASTNode, prefix: &str, is_last: bool) {
     print!("{}", connector);
 
     match node {
+
+        ASTNode::Eof => {
+            println!("End of file.");
+        }
+
         ASTNode::Number(n) => {
             println!("Number({})", n);
         }
@@ -78,6 +87,14 @@ fn pretty_print(node: &ASTNode, prefix: &str, is_last: bool) {
 
         ASTNode::BreakNode => {
             println!("Break");
+        }
+
+        ASTNode::ReturnNode(expr_opt) => {
+            println!("Return");
+            if let Some(expr) = expr_opt {
+                let new_prefix = format!("{}{}", prefix, if is_last { "    " } else { "│   " });
+                pretty_print(expr, &new_prefix, true);
+            }
         }
 
         ASTNode::StrLiteral(s) => {

@@ -8,44 +8,45 @@ let cell6 = " ";
 let cell7 = " ";
 let cell8 = " ";
 
+
 fn check(player) {
-    if (cell0 == player and cell1 == player and cell2 == player) {
+    if(cell0 == player and cell1 == player and cell2 == player) {
         return true;
     }
-    if (cell3 == player and cell4 == player and cell5 == player) {
+    if(cell3 == player and cell4 == player and cell5 == player) {
         return true;
     }
-    if (cell6 == player and cell7 == player and cell8 == player) {
+    if(cell6 == player and cell7 == player and cell8 == player) {
         return true;
     }
-    if (cell0 == player and cell3 == player and cell6 == player) {
+    if(cell0 == player and cell3 == player and cell6 == player) {
         return true;
     }
-    if (cell1 == player and cell4 == player and cell7 == player) {
+    if(cell1 == player and cell4 == player and cell7 == player) {
         return true;
     }
-    if (cell2 == player and cell5 == player and cell8 == player) {
+    if(cell2 == player and cell5 == player and cell8 == player) {
         return true;
     }
-    if (cell0 == player and cell4 == player and cell8 == player) {
+    if(cell0 == player and cell4 == player and cell8 == player) {
         return true;
     }
-    if (cell2 == player and cell4 == player and cell6 == player) {
+    if(cell2 == player and cell4 == player and cell6 == player) {
         return true;
     }
     return false;
 }
 
 fn is_full() {
-    if (cell0 == " ") { return false; }
-    if (cell1 == " ") { return false; }
-    if (cell2 == " ") { return false; }
-    if (cell3 == " ") { return false; }
-    if (cell4 == " ") { return false; }
-    if (cell5 == " ") { return false; }
-    if (cell6 == " ") { return false; }
-    if (cell7 == " ") { return false; }
-    if (cell8 == " ") { return false; }
+    if(cell0 == " ") { return false; }
+    if(cell1 == " ") { return false; }
+    if(cell2 == " ") { return false; }
+    if(cell3 == " ") { return false; }
+    if(cell4 == " ") { return false; }
+    if(cell5 == " ") { return false; }
+    if(cell6 == " ") { return false; }
+    if(cell7 == " ") { return false; }
+    if(cell8 == " ") { return false; }
     return true;
 }
 
@@ -63,17 +64,17 @@ fn play_game() {
     cell7 = " ";
     cell8 = "X";
 
-    if (check("X")) {
+    if(check("X")) {
         let win_msg = "X wins!";
         return;
     }
 
-    if (check("O")) {
+    if(check("O")) {
         let win_msg = "O wins!";
         return;
     }
 
-    if (is_full()) {
+    if(is_full()) {
         let draw = "Draw!";
         return;
     }
@@ -83,3 +84,4 @@ fn play_game() {
 }
 
 play_game();
+
