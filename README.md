@@ -21,10 +21,10 @@ Zerl is a low-level, statically typed language designed to compile directly to b
 ### Example Zerl Code
 
 ```rust
-let u8 UART0 = 0x10000000;
+let mut u8 UART0 = 0x10000000;
 
-fn putc(c: u8) {
-    *(UART0 as *mut u8) = c;
+fn putc(mut u8 c) {
+    *(UART0) = c;
 }
 
 fn main() {
