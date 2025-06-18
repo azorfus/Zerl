@@ -29,7 +29,7 @@ fn putc(c: u8) {
 
 fn main() {
     let msg = "Hello, world!\n";
-    let i = 0;
+    let mut i = 0;
     loop (msg[i] != 0) {
         putc(msg[i]);
         i = i + 1;
