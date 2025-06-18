@@ -1,6 +1,6 @@
 ### Zerl
 
-Zerl is a low-level, statically typed language designed to compile directly to bare-metal RISC-V machine code. It provides a minimal set of constructs—functions, loops, conditionals, and direct memory access—suitable for writing standalone kernels, bootable programs, or embedded applications without relying on external runtimes or standard libraries.
+Zerl is a low-level, statically typed language designed to compile directly to bare-metal RISC-V machine code. It provides a minimal set of constructs — functions, loops, conditionals, and direct memory access — suitable for writing standalone kernels, bootable programs, or embedded applications without relying on external runtimes or standard libraries.
 
 ---
 
